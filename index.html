@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PackaPro - 把网页打包成桌面软件和安卓 APP</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap">
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-soft:#f6f8fb;
+    --card:#f6f8fb;
+    --card-hover:#eef2f8;
+    --text:#1f2328;
+    --text-sub:#57606a;
+    --text-mute:#8b949e;
+    --border:#eaecef;
+    --primary:#2f9be8;
+    --primary-hover:#1f8ad8;
+    --grad-a:#38bdf8;
+    --grad-b:#f472b6;
+    --chip:#eef2f8;
+    --shadow:0 1px 2px rgba(16,24,40,.06);
+  }
+  html[data-theme="dark"]{
+    --bg:#0d1117;
+    --bg-soft:#161b22;
+    --card:#1c2128;
+    --card-hover:#232a33;
+    --text:#e6edf3;
+    --text-sub:#9da7b3;
+    --text-mute:#7d8590;
+    --border:#21262d;
+    --primary:#4db4f0;
+    --primary-hover:#6bc2f5;
+    --chip:#232a33;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+    transition:background .25s ease,color .25s ease;
+  }
+  a{color:inherit;text-decoration:none}
+  .container{max-width:1200px;margin:0 auto;padding:0 32px}
+
+  /* ===== 顶部导航 ===== */
+  header{
+    position:sticky;top:0;z-index:50;background:var(--bg);
+    border-bottom:1px solid var(--border);transition:background .25s ease;
+  }
+  .nav{display:flex;align-items:center;gap:28px;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px}
+  .brand img{width:32px;height:32px;border-radius:9px}
+  .nav-links{display:flex;align-items:center;gap:26px;margin-left:auto;font-size:15px}
+  .nav-links a{color:var(--text-sub);transition:color .15s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-links a.active{color:var(--primary);font-weight:500}
+  .nav-extra{display:flex;align-items:center;gap:18px}
+  .theme-toggle{
+    width:46px;height:26px;border-radius:13px;background:var(--chip);
+    border:1px solid var(--border);position:relative;cursor:pointer;transition:background .2s;flex:none;
+  }
+  .theme-toggle .knob{
+    position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+    background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .2s ease;color:#f5b301;font-size:12px;
+  }
+  html[data-theme="dark"] .theme-toggle .knob{transform:translateX(20px)}
+
+  /* ===== Hero ===== */
+  .hero{background:linear-gradient(180deg,var(--bg-soft) 0%,var(--bg) 100%);overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding:80px 0}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;background:var(--chip);
+    border:1px solid var(--border);border-radius:999px;padding:6px 14px;
+    font-size:13px;color:var(--primary);margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:52px;font-weight:900;letter-spacing:-.5px;line-height:1.15;margin-bottom:20px;
+    background:linear-gradient(92deg,var(--grad-a),var(--grad-b));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero p.sub{font-size:20px;color:var(--text-sub);max-width:540px;margin-bottom:34px}
+  .hero-btns{display:flex;gap:16px;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 28px;
+    font-size:15px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;
+  }
+  .btn-primary{background:linear-gradient(92deg,var(--grad-a),var(--grad-b));color:#fff}
+  .btn-primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+  .btn-ghost{background:var(--chip);color:var(--text);border-color:var(--border)}
+  .btn-ghost:hover{background:var(--card-hover)}
+  .hero-art{display:flex;justify-content:center}
+  .hero-art img{width:280px;height:280px;object-fit:contain;filter:drop-shadow(0 24px 40px rgba(56,189,248,.25))}
+  .hero-meta{display:flex;gap:28px;margin-top:36px;flex-wrap:wrap}
+  .hero-meta .m{font-size:13px;color:var(--text-mute)}
+  .hero-meta .m b{display:block;font-size:20px;color:var(--text);font-weight:700}
+
+  /* ===== 功能卡片 ===== */
+  .features{padding:64px 0}
+  .section-head{margin-bottom:44px}
+  .section-head.left{text-align:left}
+  .eyebrow{
+    font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+    color:var(--primary);margin-bottom:12px;
+  }
+  .section-head h2{font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
+  .section-head p{color:var(--text-sub);font-size:16px}
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;
+    transition:background .2s ease,transform .15s ease;
+  }
+  .card:hover{background:var(--card-hover);transform:translateY(-3px)}
+  .card .icon{
+    width:46px;height:46px;border-radius:12px;background:var(--chip);display:flex;
+    align-items:center;justify-content:center;font-size:23px;margin-bottom:18px;
+  }
+  .card h3{font-size:18px;font-weight:700;margin-bottom:10px}
+  .card p{font-size:14.5px;color:var(--text-sub)}
+
+  /* ===== 四步流程 ===== */
+  .how{padding:24px 0 72px}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:36px}
+  .step{border-top:1px solid var(--border);padding-top:20px}
+  .step .step-no{font-size:13px;font-weight:700;letter-spacing:1px;color:var(--primary);margin-bottom:10px}
+  .step h3{font-size:17px;font-weight:700;margin-bottom:8px}
+  .step p{font-size:14px;color:var(--text-sub)}
+
+  /* ===== 页脚 ===== */
+  footer{border-top:1px solid var(--border);padding:32px 0}
+  .foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;color:var(--text-mute);font-size:14px}
+  .foot .links{display:flex;gap:22px}
+  .foot a:hover{color:var(--text)}
+
+  /* ===== 响应式 ===== */
+  @media (max-width:960px){
+    .hero-grid{grid-template-columns:1fr;padding:52px 0}
+    .hero-art{order:-1}
+    .hero-art img{width:180px;height:180px}
+    .hero h1{font-size:36px}
+    .feature-grid{grid-template-columns:repeat(2,1fr)}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .nav-links{display:none}
+  }
+  @media (max-width:600px){
+    .container{padding:0 20px}
+    .feature-grid,.steps{grid-template-columns:1fr}
+    .hero h1{font-size:29px}
+    .hero p.sub{font-size:16px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<header>
+  <div class="container nav">
+    <a class="brand" href="#home">
+      <img src="assets/logo.png" alt="PackaPro">
+      <span>PackaPro</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#home" class="active">首页</a>
+      <a href="#features">功能介绍</a>
+      <a href="#faq">常见问题</a>
+    </nav>
+    <div class="nav-extra">
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题"><span class="knob" id="knob">🌙</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section class="hero" id="home">
+  <div class="container hero-grid">
+    <div>
+      <div class="badge">🧰 网页打包工具 · Windows 桌面端 / Android 端</div>
+      <h1>PackaPro</h1>
+      <p class="sub">把 HTML / 网页 / Vue / React 项目打包成桌面软件和安卓 APP。项目管理、配置、预览、一键发布，一个窗口全部完成。</p>
+      <div class="hero-btns">
+        <a class="btn btn-primary" href="downloads/packapro-setup-1.0.0.exe" download="packapro-setup-1.0.0.exe">立即下载</a>
+        <a class="btn btn-ghost" href="#features">查看功能</a>
+      </div>
+      <div class="hero-meta">
+        <div class="m"><b>v1.0.0</b>当前版本</div>
+        <div class="m"><b>Windows / Android</b>支持平台</div>
+        <div class="m"><b>单窗口</b>操作流程</div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <img src="assets/logo.png" alt="PackaPro 图标">
+    </div>
+  </div>
+</section>
+
+<!-- ===== 功能 ===== -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-head left">
+      <div class="eyebrow">Features</div>
+      <h2>一个软件，从录入网址到装到别人电脑上</h2>
+      <p>不依赖云构建服务，配置、打包、签名全部在本机完成。</p>
+    </div>
+    <div class="feature-grid">
+      <div class="card">
+        <div class="icon">🗂️</div>
+        <h3>多项目管理</h3>
+        <p>每个项目独立保存名称、网址、包名与图标，列表页一眼看到平台角标（桌面 / APK）。</p>
+      </div>
+      <div class="card">
+        <div class="icon">📝</div>
+        <h3>七行配置表单</h3>
+        <p>软件名称、网址、版本号、包名、图标、窗口尺寸、描述，桌面与移动端字段自动切换。</p>
+      </div>
+      <div class="card">
+        <div class="icon">👁️</div>
+        <h3>即时预览</h3>
+        <p>填完直接在内置 WebView2 窗口里看效果，链接在新窗口打开、外链自动拦截，所见即所得。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🖥️</div>
+        <h3>桌面端打包</h3>
+        <p>生成带自定义图标的 exe；外层用中文名，内部程序集统一为 ASCII 名，避免 apphost 内嵌中文失败的坑。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🤖</div>
+        <h3>本地出 APK</h3>
+        <p>javac → d8 → aapt2 → zipalign → apksigner 全在本地跑，签名沿用本机 keystore，出的包能直接装。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔐</div>
+        <h3>真实账号登录</h3>
+        <p>GitHub（设备码流程）与 QQ 授权都是走官方 OAuth，不假登录；登录后头像、项目数量、Token 打码一并显示。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 四步流程 ===== -->
+<section class="how" id="faq">
+  <div class="container">
+    <div class="section-head left">
+      <div class="eyebrow">How it works</div>
+      <h2>四步拿到自己的软件</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-no">STEP 01</div>
+        <h3>新建项目</h3>
+        <p>点右上角「+」，填软件名称和网址，选桌面或移动端。</p>
+      </div>
+      <div class="step">
+        <div class="step-no">STEP 02</div>
+        <h3>配好参数</h3>
+        <p>包名、版本号、图标、窗口尺寸按需改，预览里先看一遍。</p>
+      </div>
+      <div class="step">
+        <div class="step-no">STEP 03</div>
+        <h3>点发布</h3>
+        <p>选输出目录，等进度条走完，得到 exe 或 APK。</p>
+      </div>
+      <div class="step">
+        <div class="step-no">STEP 04</div>
+        <h3>装到电脑 / 手机</h3>
+        <p>exe 直接双击安装；APK 传到手机安装即可。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 页脚 ===== -->
+<footer>
+  <div class="container foot">
+    <div>© 2026 PackaPro · 网页打包桌面软件与安卓 APP</div>
+    <div class="links">
+      <a href="#features">功能介绍</a>
+      <a href="#faq">常见问题</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // 主题切换（记忆偏好）
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const knob = document.getElementById('knob');
+  function applyTheme(t){
+    root.setAttribute('data-theme', t);
+    knob.textContent = t === 'dark' ? '☀️' : '🌙';
+    try{ localStorage.setItem('packapro-theme', t); }catch(e){}
+  }
+  let saved = 'light';
+  try{ saved = localStorage.getItem('packapro-theme') || 'light'; }catch(e){}
+  applyTheme(saved);
+  toggle.addEventListener('click', () => {
+    applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // 导航高亮随滚动切换
+  const links = document.querySelectorAll('.nav-links a');
+  const sections = [...links].map(a => document.querySelector(a.getAttribute('href')));
+  window.addEventListener('scroll', () => {
+    let idx = 0;
+    sections.forEach((s, i) => { if(s && s.getBoundingClientRect().top <= 120) idx = i; });
+    links.forEach((a, i) => a.classList.toggle('active', i === idx));
+  });
+</script>
+</body>
+</html>
